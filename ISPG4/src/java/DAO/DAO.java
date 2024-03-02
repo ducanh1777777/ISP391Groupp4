@@ -9,6 +9,7 @@ import entity.Users;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import ultil.MD5;
 import ultil.SendMail;
 
@@ -89,5 +90,241 @@ public class DAO {
             e.printStackTrace();
             return false;
         }
+    }
+    
+    public boolean checkUserExists(String username) {
+        String sql = "SELECT COUNT(*) FROM Users WHERE username = ?";
+        try {
+
+            conn = new DBContext().getConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, username);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (ps != null) {
+                    ps.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return false;
+    }
+
+    public boolean checkEmailExists(String email) {
+        String sql = "SELECT COUNT(*) FROM Users WHERE email = ?";
+        try {
+            conn = new DBContext().getConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, email);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (ps != null) {
+                    ps.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return false;
+    }
+
+    public void updatePassword(String email, String newPassword) {
+        try {
+            String sql = "UPDATE Users SET password = ? WHERE email = ?";
+            conn = new DBContext().getConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, MD5.getMd5(newPassword)); // Mã hóa mật khẩu mới
+            ps.setString(2, email);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+//public void saveOTP(String email, String otp, Timestamp expiryTime) {
+//    try {
+//        String sql = "INSERT INTO otp_table (email, otp, expiry_time) VALUES (?, ?, ?)";
+//        conn = new DBContext().getConnection();
+//        ps = conn.prepareStatement(sql);
+//        ps.setString(1, email);
+//        ps.setString(2, otp);
+//        ps.setTimestamp(3, expiryTime);
+//        ps.executeUpdate();
+//    } catch (Exception e) {
+//        e.printStackTrace();
+//    } 
+//}
+    public void saveOTP(String email, String otp) {
+        try {
+            String sql = "INSERT INTO otp_table (email, otp) VALUES (?, ?)";
+            conn = new DBContext().getConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, email);
+            ps.setString(2, otp);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void saveOTP(String email, String otp, Timestamp expiryTime) {
+        try {
+            String sql = "UPDATE Users SET otp = ?, otp_expiry = ? WHERE email = ?";
+            conn = new DBContext().getConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, otp);
+            ps.setTimestamp(2, expiryTime);
+            ps.setString(3, email);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+//public boolean checkOTP(String email, String otp) {
+//    try {
+//        String sql = "SELECT COUNT(*) FROM otp_table WHERE email = ? AND otp = ? AND expiry_time > CURRENT_TIMESTAMP";
+//        conn = new DBContext().getConnection();
+//        ps = conn.prepareStatement(sql);
+//        ps.setString(1, email);
+//        ps.setString(2, otp);
+//        rs = ps.executeQuery();
+//        if (rs.next()) {
+//            return rs.getInt(1) > 0;
+//        }
+//    } catch (Exception e) {
+//        e.printStackTrace();
+//    } 
+//    return false;
+//}
+    public boolean checkOTP(String email, String otp) {
+        try {
+            String sql = "SELECT COUNT(*) FROM Users WHERE email = ? AND otp = ? AND otp_expiry > CURRENT_TIMESTAMP";
+            conn = new DBContext().getConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, email);
+            ps.setString(2, otp);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean checkOTPNotExpired(String email, String otp) {
+        try {
+            String sql = "SELECT otp_expiry FROM Users WHERE email = ? AND otp = ? AND otp_expiry > CURRENT_TIMESTAMP";
+            conn = new DBContext().getConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, email);
+            ps.setString(2, otp);
+            rs = ps.executeQuery();
+            return rs.next(); // Nếu có bất kỳ kết quả nào, tức là OTP hợp lệ và chưa hết hạn
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (ps != null) {
+                    ps.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return false; // Nếu có lỗi xảy ra hoặc không tìm thấy OTP hợp lệ
+    }
+
+    public String getEmailByOTP(String otp) {
+        String sql = "SELECT email FROM Users WHERE otp = ?";
+        try {
+            conn = new DBContext().getConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, otp);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getString("email");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public void changePassword(String email, String newPassword) {
+        String sql = "UPDATE Users SET password = ? WHERE email = ?";
+        try {
+            conn = new DBContext().getConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, newPassword);
+            ps.setString(2, email);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void resetOTP(String email) {
+        String sql = "UPDATE Users SET otp = null WHERE email = ?";
+        try {
+            conn = new DBContext().getConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, email);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean checkOTPMatchesEmail(String email, String otp) {
+        String sql = "SELECT otp FROM Users WHERE email = ?";
+        try {
+            conn = new DBContext().getConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, email);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                String storedOTP = rs.getString("otp");
+                return otp.equals(storedOTP);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

@@ -4,9 +4,17 @@
         <servlet-name>verifyUser</servlet-name>
         <servlet-class>controller.verifyUser</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ForgotPassword</servlet-name>
+        <servlet-class>controller.ForgotPassword</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>verifyUser</servlet-name>
         <url-pattern>/verify-user</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ForgotPassword</servlet-name>
+        <url-pattern>/forgotPassword</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
