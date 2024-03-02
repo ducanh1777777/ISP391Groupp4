@@ -327,4 +327,33 @@ public class DAO {
         }
         return false;
     }
+    
+    public boolean checkOldPassword(String username, String oldPassword) {
+        try {
+            String sql = "SELECT * FROM Users WHERE username = ? AND password = ?";
+            conn = new DBContext().getConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, username);
+            ps.setString(2, MD5.getMd5(oldPassword)); // Sử dụng MD5 để mã hóa mật khẩu cũ
+            rs = ps.executeQuery();
+            return rs.next();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public void changePassword1(String username, String newPassword) {
+        try {
+            String sql = "UPDATE Users SET password = ? WHERE username = ?";
+            conn = new DBContext().getConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, MD5.getMd5(newPassword)); // Mã hóa mật khẩu mới
+            ps.setString(2, username);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
 }
