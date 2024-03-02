@@ -11,6 +11,12 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.util.Random;
+import javax.imageio.ImageIO;
 
 /**
  *
@@ -57,7 +63,33 @@ public class CaptchaGenerator extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        response.setContentType("image/jpeg");
+        String captchaText = generateCaptchaText(5); // 6 characters captcha
+        request.getSession().setAttribute("captcha", captchaText);
+
+        BufferedImage image = new BufferedImage(150, 50, BufferedImage.TYPE_INT_RGB);
+        Graphics2D graphics = image.createGraphics();
+
+        graphics.setColor(Color.LIGHT_GRAY);
+        graphics.fillRect(0, 0, 150, 50);
+        graphics.setColor(Color.BLACK);
+        graphics.setFont(new Font("Arial", Font.BOLD, 30));
+        graphics.drawString(captchaText, 10, 35);
+
+        ImageIO.write(image, "jpeg", response.getOutputStream());
+        graphics.dispose();
+    }
+    
+    private String generateCaptchaText(int length) {
+        String characters = "ABCDEFGHJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz123456789";
+        Random random = new Random();
+        StringBuilder captchaText = new StringBuilder(length);
+
+        for (int i = 0; i < length; i++) {
+            captchaText.append(characters.charAt(random.nextInt(characters.length())));
+        }
+
+        return captchaText.toString();
     }
 
     /**
