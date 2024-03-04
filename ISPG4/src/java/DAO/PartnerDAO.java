@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 /**
@@ -204,4 +205,55 @@ public class PartnerDAO {
             return null;
         }
     }
+    
+    public void insertInvoice(int userid,int partnerid, String status, double amountMoney, Timestamp time,  String debtType) {
+    Connection conn = null;
+    PreparedStatement ps = null;
+    try {
+        conn = new DBContext().getConnection();
+        conn.setAutoCommit(false);
+
+        String sql = "INSERT INTO Invoice (userid, partnerid, amountMoney, status, time, debtType) VALUES (?, ?, ?, ?, ?, ?)";
+        ps = conn.prepareStatement(sql);
+        ps.setInt(1, userid);
+        ps.setInt(2, partnerid);
+        ps.setDouble(3, amountMoney); // amountMoney đã bao gồm dấu (+/-) dựa trên loại nợ
+        ps.setString(4, status);
+        ps.setTimestamp(5, time);
+        ps.setString(6, debtType);
+        ps.executeUpdate();
+        
+//        String updateSql = "UPDATE Partner SET amountMoney = amountMoney + ? WHERE id = ?;";
+//        ps = conn.prepareStatement(updateSql);
+//        ps.setDouble(1, amountMoney); // Số tiền này đã bao gồm dấu (+/-) dựa trên loại nợ
+//        ps.setInt(2, partnerid);
+//        ps.executeUpdate();
+        
+        conn.commit();
+    } catch (SQLException e) {
+        if (conn != null) {
+            try {
+                conn.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+        e.printStackTrace();
+    } finally {
+        if (ps != null) {
+            try {
+                ps.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        if (conn != null) {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
 }
