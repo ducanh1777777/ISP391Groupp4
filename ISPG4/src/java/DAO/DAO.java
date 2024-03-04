@@ -9,7 +9,10 @@ import entity.Users;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import ultil.MD5;
 import ultil.SendMail;
 
@@ -355,5 +358,59 @@ public class DAO {
             e.printStackTrace();
         }
 
+    }
+    public ArrayList<Users> getAllUsers() {
+
+        try {
+            ArrayList<Users> list = new ArrayList<>();
+            String query = "select * from Users";
+            conn = new DBContext().getConnection();//mo ket noi voi sql
+            ps = conn.prepareStatement(query);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Users user = new Users();
+                user.setId(rs.getInt(1));
+                user.setUsername(rs.getString(2));
+                user.setPassword(rs.getString(3));
+                user.setFullname(rs.getString(4));
+                user.setDob(rs.getString(5));
+                user.setEmail(rs.getString(6));
+                user.setPhone(rs.getString(7));
+                user.setIsAdmin(rs.getInt(16));
+                list.add(user);
+            }
+            return list;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
+    public List<Users> getTotalUsers() {
+        List<Users> list = new ArrayList<>();
+        String query = "select count(*) from Users";
+        try {
+
+            conn = new DBContext().getConnection();//mo ket noi voi sql
+            ps = conn.prepareStatement(query);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Users u = new Users();
+                list.add(u);
+            }
+
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return list;
+    }
+
+    public List<Users> getListByPage(List<Users> list, int start, int end) {
+        ArrayList<Users> arr = new ArrayList<>();
+        for (int i = start; i < end; i++) {
+            arr.add(list.get(i));
+        }
+        return arr;
     }
 }
