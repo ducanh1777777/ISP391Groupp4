@@ -16,6 +16,14 @@
         <servlet-name>ChangePassword2</servlet-name>
         <servlet-class>controller.ChangePassword2</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>searchPartners</servlet-name>
+        <servlet-class>controller.searchPartners</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>serachPartners2</servlet-name>
+        <servlet-class>controller.serachPartners2</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>verifyUser</servlet-name>
         <url-pattern>/verify-user</url-pattern>
@@ -31,6 +39,14 @@
     <servlet-mapping>
         <servlet-name>ChangePassword2</servlet-name>
         <url-pattern>/changePassword2</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>searchPartners</servlet-name>
+        <url-pattern>/searchPartners</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>serachPartners2</servlet-name>
+        <url-pattern>/serachPartners2</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

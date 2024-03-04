@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -255,5 +256,131 @@ public class PartnerDAO {
             }
         }
     }
+}
+    
+    public List<Partner> searchPartners(int id, String name, String address, String phone, String email, double debt) {
+    List<Partner> partners = new ArrayList<>();
+    // Bắt đầu với một câu truy vấn cơ bản không có điều kiện tìm kiếm cụ thể
+    String sql = "SELECT * FROM Partner WHERE is_delete=0 and amountMoney>=0";
+    List<Object> params = new ArrayList<>();
+
+    if (id > 0) {
+        sql += " AND id = ?";
+        params.add(id);
+    }
+    if (name != null && !name.trim().isEmpty()) {
+        sql += " AND (partnerName LIKE ? OR partnerName LIKE ?)";
+        params.add(name.trim() + "%"); 
+        params.add("% " + name.trim() + "%"); // Matches the start of any subsequent word in the name
+    }
+
+    if (address != null && !address.trim().isEmpty()) {
+    sql += " AND (partnerAddress LIKE ? OR partnerAddress LIKE ?)";
+    params.add(address.trim() + "%"); // Matches the start of the address
+    params.add("% " + address.trim() + "%"); // Matches the start of any subsequent word in the address
+}
+    if (phone != null && !phone.trim().isEmpty()) {
+        sql += " AND partnerPhone LIKE ?";
+        params.add("%" + phone.trim() + "%");
+    }
+    if (email != null && !email.trim().isEmpty()) {
+        sql += " AND LOWER(partnerEmail) LIKE LOWER(?)";
+        params.add("%" + email.trim() + "%");
+    }
+    if (debt > 0) { // Chỉ thêm điều kiện này nếu debt > 0
+        sql += " AND amountMoney >= ?"; // Tìm các đối tác có khoản nợ lớn hơn hoặc bằng giá trị nhập vào
+        params.add(debt);
+    }
+
+    // Xóa bỏ logic thừa liên quan đến xử lý 'debt' ở đây
+
+    try (Connection conn = new DBContext().getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+         
+        // Đặt giá trị cho các tham số của PreparedStatement
+        for (int i = 0; i < params.size(); i++) {
+            ps.setObject(i + 1, params.get(i));
+        }
+        
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Partner partner = new Partner();
+                partner.setId(rs.getInt("id"));
+                partner.setUserid(rs.getInt("userid"));
+                partner.setPartnerName(rs.getString("partnerName"));
+                partner.setPartnerAddress(rs.getString("partnerAddress"));
+                partner.setPartnerPhone(rs.getString("partnerPhone"));
+                partner.setPartnerEmail(rs.getString("partnerEmail"));
+                partner.setAmountMoney(rs.getDouble("amountMoney"));
+                partners.add(partner);
+            }
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return partners;
+}
+     
+      public List<Partner> searchPartners2(int id, String name, String address, String phone, String email, double debt) {
+    List<Partner> partners = new ArrayList<>();
+    // Bắt đầu với một câu truy vấn cơ bản không có điều kiện tìm kiếm cụ thể
+    String sql = "SELECT * FROM Partner WHERE is_delete=0 and amountMoney<0";
+    List<Object> params = new ArrayList<>();
+
+    if (id > 0) {
+        sql += " AND id = ?";
+        params.add(id);
+    }
+    if (name != null && !name.trim().isEmpty()) {
+        sql += " AND (partnerName LIKE ? OR partnerName LIKE ?)";
+        params.add(name.trim() + "%"); 
+        params.add("% " + name.trim() + "%"); // Matches the start of any subsequent word in the name
+    }
+
+    if (address != null && !address.trim().isEmpty()) {
+    sql += " AND (partnerAddress LIKE ? OR partnerAddress LIKE ?)";
+    params.add(address.trim() + "%"); // Matches the start of the address
+    params.add("% " + address.trim() + "%"); // Matches the start of any subsequent word in the address
+}
+    if (phone != null && !phone.trim().isEmpty()) {
+        sql += " AND partnerPhone LIKE ?";
+        params.add("%" + phone.trim() + "%");
+    }
+    if (email != null && !email.trim().isEmpty()) {
+        sql += " AND LOWER(partnerEmail) LIKE LOWER(?)";
+        params.add("%" + email.trim() + "%");
+    }
+    if (debt > 0) { // Chỉ thêm điều kiện này nếu debt > 0
+        sql += " AND amountMoney >= ?"; // Tìm các đối tác có khoản nợ lớn hơn hoặc bằng giá trị nhập vào
+        params.add(debt);
+    }
+
+    // Xóa bỏ logic thừa liên quan đến xử lý 'debt' ở đây
+
+    try (Connection conn = new DBContext().getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+         
+        // Đặt giá trị cho các tham số của PreparedStatement
+        for (int i = 0; i < params.size(); i++) {
+            ps.setObject(i + 1, params.get(i));
+        }
+        
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Partner partner = new Partner();
+                partner.setId(rs.getInt("id"));
+                partner.setUserid(rs.getInt("userid"));
+                partner.setPartnerName(rs.getString("partnerName"));
+                partner.setPartnerAddress(rs.getString("partnerAddress"));
+                partner.setPartnerPhone(rs.getString("partnerPhone"));
+                partner.setPartnerEmail(rs.getString("partnerEmail"));
+                partner.setAmountMoney(rs.getDouble("amountMoney"));
+                partners.add(partner);
+            }
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return partners;
 }
 }
