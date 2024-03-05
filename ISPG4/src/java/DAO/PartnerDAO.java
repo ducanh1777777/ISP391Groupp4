@@ -257,7 +257,7 @@ public class PartnerDAO {
         }
     }
 }
-    
+
     public List<Partner> searchPartners(int id, String name, String address, String phone, String email, double debt) {
     List<Partner> partners = new ArrayList<>();
     // Bắt đầu với một câu truy vấn cơ bản không có điều kiện tìm kiếm cụ thể
