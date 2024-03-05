@@ -11,7 +11,7 @@ import java.sql.Timestamp;
  * @author Lenovo
  */
 public class Invoice {
-    private int id;
+   private int id;
     private int userId;
     private int partnerId;
     private double amountMoney;
@@ -22,12 +22,13 @@ public class Invoice {
     private String createBy;
     private Timestamp deleteAt;
     private String deleteBy;
-    private boolean is_delete;
+    private boolean isDelete;
+    private String debtType;
 
     public Invoice() {
     }
 
-    public Invoice(int id, int userId, int partnerId, double amountMoney, String status, Timestamp time, Timestamp createdAt, Timestamp updatedAt, String createBy, Timestamp deleteAt, String deleteBy, boolean is_delete) {
+    public Invoice(int id, int userId, int partnerId, double amountMoney, String status, Timestamp time, Timestamp createdAt, Timestamp updatedAt, String createBy, Timestamp deleteAt, String deleteBy, boolean isDelete) {
         this.id = id;
         this.userId = userId;
         this.partnerId = partnerId;
@@ -39,8 +40,24 @@ public class Invoice {
         this.createBy = createBy;
         this.deleteAt = deleteAt;
         this.deleteBy = deleteBy;
-        this.is_delete = is_delete;
+        this.isDelete = isDelete;
     }
+    
+    public Invoice(int id, int userId, int partnerId, double amountMoney, String status, Timestamp time, Timestamp createdAt, Timestamp updatedAt, String createBy, Timestamp deleteAt, String deleteBy, boolean isDelete, String debtType) {
+       this.id = id;
+       this.userId = userId;
+       this.partnerId = partnerId;
+       this.amountMoney = amountMoney;
+       this.status = status;
+       this.time = time;
+       this.createdAt = createdAt;
+       this.updatedAt = updatedAt;
+       this.createBy = createBy;
+       this.deleteAt = deleteAt;
+       this.deleteBy = deleteBy;
+       this.isDelete = isDelete;
+       this.debtType = debtType; // Khởi tạo giá trị cho trường mới
+   }
 
     public int getId() {
         return id;
@@ -130,11 +147,21 @@ public class Invoice {
         this.deleteBy = deleteBy;
     }
 
-    public boolean isIs_delete() {
-        return is_delete;
+    public boolean isIsDelete() {
+        return isDelete;
     }
 
-    public void setIs_delete(boolean is_delete) {
-        this.is_delete = is_delete;
+    public void setIsDelete(boolean isDelete) {
+        this.isDelete = isDelete;
     }
+    
+    public String getDebtType() {
+       return debtType;
+   }
+
+   public void setDebtType(String debtType) {
+       this.debtType = debtType;
+   }
+
+ 
 }
