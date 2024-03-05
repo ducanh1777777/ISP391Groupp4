@@ -5,6 +5,7 @@
 package DAO;
 
 import context.DBContext;
+import entity.Partner;
 import entity.Users;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -412,5 +413,33 @@ public class DAO {
             arr.add(list.get(i));
         }
         return arr;
+    }
+    
+    public ArrayList<Partner> getListPartner() {
+        String sql1 = "SELECT p.id, p.userid, p.partnerName, p.partnerAddress, p.partnerPhone, p.partnerEmail, p.amountMoney "
+               + "FROM Partner p "
+               + "LEFT JOIN Users u ON p.userid = u.id "
+               + "WHERE p.is_delete = 0";
+        try {
+            ArrayList<Partner> list = new ArrayList<>();
+            conn = new DBContext().getConnection();
+            ps = conn.prepareStatement(sql1);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Partner u = new Partner();
+                u.setId(rs.getInt("id"));
+                u.setUserid(rs.getInt("userid"));
+                u.setPartnerName(rs.getString("partnerName"));
+                u.setPartnerAddress(rs.getString("partnerAddress"));
+                u.setPartnerPhone(rs.getString("partnerPhone"));
+                u.setPartnerEmail(rs.getString("partnerEmail"));
+                u.setAmountMoney(rs.getDouble("amountMoney"));
+                list.add(u);
+            }
+            return list;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

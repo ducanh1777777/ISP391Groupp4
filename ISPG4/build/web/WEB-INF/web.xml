@@ -24,6 +24,10 @@
         <servlet-name>serachPartners2</servlet-name>
         <servlet-class>controller.serachPartners2</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>partner2</servlet-name>
+        <servlet-class>controller.partner2</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>verifyUser</servlet-name>
         <url-pattern>/verify-user</url-pattern>
@@ -47,6 +51,10 @@
     <servlet-mapping>
         <servlet-name>serachPartners2</servlet-name>
         <url-pattern>/serachPartners2</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>partner2</servlet-name>
+        <url-pattern>/partner2</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
