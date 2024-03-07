@@ -54,16 +54,18 @@ public class verifyUser extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-         String username = request.getParameter("username");
+        String username = request.getParameter("username");
+        String token = request.getParameter("token");
 
         if (username != null && !username.isEmpty()) {
-                new DAO().accAccount(username);
+                new DAO().accAccount(username,token);
                 String encodedURL = response.encodeRedirectURL("login.jsp");
                 response.sendRedirect(encodedURL);
             } else {
                 String encodedURL1 = response.encodeRedirectURL("baoloi.jsp");
                 response.sendRedirect(encodedURL1);
             }
+       
        
     } 
 
