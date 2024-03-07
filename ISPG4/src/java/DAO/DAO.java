@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import ultil.MD5;
 import ultil.SendMail;
 
@@ -56,9 +57,10 @@ public class DAO {
         try {
 
             String password = MD5.getMd5(pass);
+            String token = UUID.randomUUID().toString(); // Tạo mã token ngẫu nhiên
             //chuan bi string sql
-            String sql = "insert into Users (username, password, fullname, dob, email, is_active, created_at )\n"
-                    + "values (?,?,?,?,?,0,NOW())";
+            String sql = "insert into Users (username, password, fullname, dob, email, is_active, created_at, token )\n"
+                    + "values (?,?,?,?,?,0,NOW(),?)";
             conn = new DBContext().getConnection();//mo ket noi voi sql
             ps = conn.prepareStatement(sql);
             //set bien dungs voiw thuw tu bien trong string tren
@@ -67,13 +69,14 @@ public class DAO {
             ps.setString(3, name);
             ps.setString(4, birth);
             ps.setString(5, email);
+            ps.setString(6, token);
 
             //goi cau lenh execute
             ps.executeUpdate();
 
             SendMail.send(email, "Verify new user", "<h2>Welcome to my system</h2>"
-                    + "<a href=\"http://localhost:9999/ISPG4/verify-user?username="
-                    + username + " \" > Click here to verify your account!</a> ");
+                    + "<a href=\"http://localhost:8080/ISPG4/verify-user?username="
+                    + username + "&token=" + token + " \" > Click here to verify your account!</a> ");
             return username;
         } catch (Exception e) {
             e.printStackTrace();
@@ -81,12 +84,13 @@ public class DAO {
         }
     }
 
-    public boolean accAccount(String username) {
+    public boolean accAccount(String username, String token) {
         try {
-            String sql = " update Users set is_active = 1 where username = ?";
+            String sql = " update Users set is_active = 1 where username = ? and token = ?";
             conn = new DBContext().getConnection();//mo ket noi voi sql
             ps = conn.prepareStatement(sql);
             ps.setString(1, username);
+            ps.setString(2, token);
             ps.executeUpdate();
             return true;
 
