@@ -257,6 +257,53 @@ public class PartnerDAO {
         }
     }
 }
+      public Partner getPartner(int id) {
+        Partner partner = null;
+        String sql = "SELECT * FROM Partner WHERE id = ?";
+        try (Connection conn = new DBContext().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                partner = new Partner(
+                        rs.getInt("id"),
+                        rs.getInt("userid"),
+                        rs.getString("partnerName"),
+                        rs.getString("partnerPhone"),
+                        rs.getString("partnerEmail"),
+                        rs.getString("partnerAddress"),
+                        rs.getDouble("amountMoney")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle exception
+        }
+        return partner;
+    }
+     public void updatePartner(Partner partner) {
+        String sql = "UPDATE Partner SET userid = ?, partnerName = ?, partnerPhone = ?, partnerEmail = ?, partnerAddress = ?, amountMoney = ? WHERE id = ?";
+        try (Connection conn = new DBContext().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, partner.getUserid());
+            ps.setString(2, partner.getPartnerName());
+            ps.setString(3, partner.getPartnerPhone());
+            ps.setString(4, partner.getPartnerEmail());
+            ps.setString(5, partner.getPartnerAddress());
+            ps.setDouble(6, partner.getAmountMoney());
+            ps.setInt(7, partner.getId());
+
+            int affectedRows = ps.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Updating partner failed, no rows affected.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle exception
+        }
+    }
+     
 
     public List<Partner> searchPartners(int id, String name, String address, String phone, String email, double debt) {
     List<Partner> partners = new ArrayList<>();
