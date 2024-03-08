@@ -28,6 +28,10 @@
         <servlet-name>partner2</servlet-name>
         <servlet-class>controller.partner2</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>viewUserProfile</servlet-name>
+        <servlet-class>controller.viewUserProfile</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>verifyUser</servlet-name>
         <url-pattern>/verify-user</url-pattern>
@@ -55,6 +59,10 @@
     <servlet-mapping>
         <servlet-name>partner2</servlet-name>
         <url-pattern>/partner2</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>viewUserProfile</servlet-name>
+        <url-pattern>/viewUserProfile</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
