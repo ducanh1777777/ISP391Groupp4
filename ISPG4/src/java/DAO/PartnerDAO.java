@@ -383,4 +383,40 @@ public class PartnerDAO {
     }
     return partners;
 }
+      
+      
+     // Method to soft-delete invoices by partner ID
+    public void deletePartnerInvoices(int partnerId) {
+        String sql = "UPDATE Invoice SET is_delete = 1 WHERE partnerid = ?";
+        try (Connection conn = new DBContext().getConnection();
+             PreparedStatement statement = conn.prepareStatement(sql)) {
+            statement.setInt(1, partnerId);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Consider logging this error or throwing a custom exception
+        }
+    }
+    
+    // Method to soft-delete a partner by ID
+    public void deletePartner(int id) {
+        String sql = "UPDATE Partner SET is_delete = 1 WHERE id = ?";
+        try (Connection conn = new DBContext().getConnection();
+             PreparedStatement statement = conn.prepareStatement(sql)) {
+            statement.setInt(1, id);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Consider logging this error or throwing a custom exception
+        }
+    }
+    
+    // Method to soft-delete both partner and their invoices
+    public void deletePartnerAndInvoices(int partnerId) {
+        // Soft-delete invoices first to maintain referential integrity
+        deletePartnerInvoices(partnerId);
+        // Then soft-delete the partner
+        deletePartner(partnerId);
+    }
+    
 }
