@@ -100,6 +100,48 @@ public class DAO {
         }
     }
     
+     public Users updateProfileUser(String username, String fullname, String dob, String email, String phone) {
+        Users updatedUser = null;
+        try {
+            String sql = "update Users set fullname = ?, dob = ?, email = ?, phone = ?,update_at = CURRENT_TIMESTAMP where username = ?";
+            conn = new DBContext().getConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, fullname);
+            ps.setString(2, dob);
+            ps.setString(3, email);
+            ps.setString(4, phone);
+            ps.setString(5, username);
+            int rowsAffected = ps.executeUpdate();
+
+            if (rowsAffected > 0) {
+                // If the update was successful, retrieve the updated user information
+                String selectSql = "select * from Users where username = ?";
+                ps = conn.prepareStatement(selectSql);
+                ps.setString(1, username);
+                ResultSet rs = ps.executeQuery();
+
+                if (rs.next()) {
+                    // Create a User object with the updated information
+                    updatedUser = new Users();
+                    updatedUser.setUsername(rs.getString("username"));
+                    updatedUser.setFullname(rs.getString("fullname"));
+                    updatedUser.setDob(rs.getString("dob"));
+                    updatedUser.setEmail(rs.getString("email"));
+                    updatedUser.setPhone(rs.getString("phone"));
+                }
+
+                rs.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            // Close resources (Connection, PreparedStatement, etc.)
+            // You should handle closing resources properly, preferably in a try-with-resources block
+        }
+
+        return updatedUser;
+    }
+    
     public boolean checkUserExists(String username) {
         String sql = "SELECT COUNT(*) FROM Users WHERE username = ?";
         try {
