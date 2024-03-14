@@ -114,7 +114,7 @@ $(document).ready(function() {
                
                 </c:if></a>
                     <a class="dropdown-item" href="changePassword.jsp">Thay đổi mật khẩu</a>
-                    <a class="dropdown-item" href="logout">Đăng xuất</a>
+                    <a class="dropdown-item" href="Logout">Đăng xuất</a>
                     
                 </div>
             </li>
