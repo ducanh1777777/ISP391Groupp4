@@ -32,6 +32,14 @@
         <servlet-name>viewUserProfile</servlet-name>
         <servlet-class>controller.viewUserProfile</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>Logout</servlet-name>
+        <servlet-class>controller.Logout</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>Logoutt</servlet-name>
+        <servlet-class>controller.Logoutt</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>verifyUser</servlet-name>
         <url-pattern>/verify-user</url-pattern>
@@ -63,6 +71,10 @@
     <servlet-mapping>
         <servlet-name>viewUserProfile</servlet-name>
         <url-pattern>/viewUserProfile</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Logoutt</servlet-name>
+        <url-pattern>/Logoutt</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
