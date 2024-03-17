@@ -206,62 +206,61 @@ public class PartnerDAO {
             return null;
         }
     }
-    
-    public void insertInvoice(int userid,int partnerid, String status, double amountMoney, Timestamp time,  String debtType) {
-    Connection conn = null;
-    PreparedStatement ps = null;
-    try {
-        conn = new DBContext().getConnection();
-        conn.setAutoCommit(false);
 
-        String sql = "INSERT INTO Invoice (userid, partnerid, amountMoney, status, time, debtType) VALUES (?, ?, ?, ?, ?, ?)";
-        ps = conn.prepareStatement(sql);
-        ps.setInt(1, userid);
-        ps.setInt(2, partnerid);
-        ps.setDouble(3, amountMoney); // amountMoney đã bao gồm dấu (+/-) dựa trên loại nợ
-        ps.setString(4, status);
-        ps.setTimestamp(5, time);
-        ps.setString(6, debtType);
-        ps.executeUpdate();
-        
+    public void insertInvoice(int userid, int partnerid, String status, double amountMoney, Timestamp time, String debtType) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = new DBContext().getConnection();
+            conn.setAutoCommit(false);
+
+            String sql = "INSERT INTO Invoice (userid, partnerid, amountMoney, status, time, debtType) VALUES (?, ?, ?, ?, ?, ?)";
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, userid);
+            ps.setInt(2, partnerid);
+            ps.setDouble(3, amountMoney); // amountMoney đã bao gồm dấu (+/-) dựa trên loại nợ
+            ps.setString(4, status);
+            ps.setTimestamp(5, time);
+            ps.setString(6, debtType);
+            ps.executeUpdate();
+
 //        String updateSql = "UPDATE Partner SET amountMoney = amountMoney + ? WHERE id = ?;";
 //        ps = conn.prepareStatement(updateSql);
 //        ps.setDouble(1, amountMoney); // Số tiền này đã bao gồm dấu (+/-) dựa trên loại nợ
 //        ps.setInt(2, partnerid);
 //        ps.executeUpdate();
-        
-        conn.commit();
-    } catch (SQLException e) {
-        if (conn != null) {
-            try {
-                conn.rollback();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
+            conn.commit();
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
             }
-        }
-        e.printStackTrace();
-    } finally {
-        if (ps != null) {
-            try {
-                ps.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
+            e.printStackTrace();
+        } finally {
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
-        }
-        if (conn != null) {
-            try {
-                conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
-}
-      public Partner getPartner(int id) {
+
+    public Partner getPartner(int id) {
         Partner partner = null;
         String sql = "SELECT * FROM Partner WHERE id = ?";
-        try (Connection conn = new DBContext().getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = new DBContext().getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -281,37 +280,36 @@ public class PartnerDAO {
         }
         return partner;
     }
-         public void updatePartner(Partner partner) {
-    String sql = "UPDATE Partner SET userid = ?, partnerName = ?, partnerPhone = ?, partnerEmail = ?, partnerAddress = ? WHERE id = ?";
-    try (Connection conn = new DBContext().getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        
-        ps.setInt(1, partner.getUserid());
-        ps.setString(2, partner.getPartnerName());
-        ps.setString(3, partner.getPartnerPhone());
-        ps.setString(4, partner.getPartnerEmail());
-        ps.setString(5, partner.getPartnerAddress());
-        // Uncomment the following line if you want to update the amountMoney field.
-        // ps.setDouble(6, partner.getAmountMoney());
-        ps.setInt(6, partner.getId()); // This should be the last parameter now after removing the extra comma.
 
-        int affectedRows = ps.executeUpdate();
-        if (affectedRows == 0) {
-            throw new SQLException("Updating partner failed, no rows affected.");
+    public void updatePartner(Partner partner) {
+        String sql = "UPDATE Partner SET userid = ?, partnerName = ?, partnerPhone = ?, partnerEmail = ?, partnerAddress = ? WHERE id = ?";
+        try ( Connection conn = new DBContext().getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, partner.getUserid());
+            ps.setString(2, partner.getPartnerName());
+            ps.setString(3, partner.getPartnerPhone());
+            ps.setString(4, partner.getPartnerEmail());
+            ps.setString(5, partner.getPartnerAddress());
+            // Uncomment the following line if you want to update the amountMoney field.
+            // ps.setDouble(6, partner.getAmountMoney());
+            ps.setInt(6, partner.getId()); // This should be the last parameter now after removing the extra comma.
+
+            int affectedRows = ps.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Updating partner failed, no rows affected.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle exception
         }
-    } catch (SQLException e) {
-        e.printStackTrace();
-        // Handle exception
-    }
 
     }
-     
-     public Partner getPartnerById(int partnerId) {
+
+    public Partner getPartnerById(int partnerId) {
         Partner partner = null;
-        try (Connection conn = new DBContext().getConnection();
-             PreparedStatement ps = conn.prepareStatement("SELECT * FROM Partner WHERE id = ?")) {
+        try ( Connection conn = new DBContext().getConnection();  PreparedStatement ps = conn.prepareStatement("SELECT * FROM Partner WHERE id = ?")) {
             ps.setInt(1, partnerId);
-            try (ResultSet rs = ps.executeQuery()) {
+            try ( ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     partner = new Partner();
                     partner.setId(rs.getInt("id"));
@@ -329,140 +327,127 @@ public class PartnerDAO {
         }
         return partner;
     }
-     
 
     public List<Partner> searchPartners(int id, String name, String address, String phone, String email, double debt) {
-    List<Partner> partners = new ArrayList<>();
-    // Bắt đầu với một câu truy vấn cơ bản không có điều kiện tìm kiếm cụ thể
-    String sql = "SELECT * FROM Partner WHERE is_delete=0 and amountMoney>=0";
-    List<Object> params = new ArrayList<>();
+        List<Partner> partners = new ArrayList<>();
+        String sql = "SELECT * FROM Partner WHERE is_delete=0";
+        List<Object> params = new ArrayList<>();
 
-    if (id > 0) {
-        sql += " AND id = ?";
-        params.add(id);
-    }
-    if (name != null && !name.trim().isEmpty()) {
-        sql += " AND (partnerName LIKE ? OR partnerName LIKE ?)";
-        params.add(name.trim() + "%"); 
-        params.add("% " + name.trim() + "%"); // Matches the start of any subsequent word in the name
-    }
-
-    if (address != null && !address.trim().isEmpty()) {
-    sql += " AND (partnerAddress LIKE ? OR partnerAddress LIKE ?)";
-    params.add(address.trim() + "%"); // Matches the start of the address
-    params.add("% " + address.trim() + "%"); // Matches the start of any subsequent word in the address
-}
-    if (phone != null && !phone.trim().isEmpty()) {
-        sql += " AND partnerPhone LIKE ?";
-        params.add("%" + phone.trim() + "%");
-    }
-    if (email != null && !email.trim().isEmpty()) {
-        sql += " AND LOWER(partnerEmail) LIKE LOWER(?)";
-        params.add("%" + email.trim() + "%");
-    }
-    if (debt > 0) { // Chỉ thêm điều kiện này nếu debt > 0
-        sql += " AND amountMoney >= ?"; // Tìm các đối tác có khoản nợ lớn hơn hoặc bằng giá trị nhập vào
-        params.add(debt);
-    }
-
-    // Xóa bỏ logic thừa liên quan đến xử lý 'debt' ở đây
-
-    try (Connection conn = new DBContext().getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-         
-        // Đặt giá trị cho các tham số của PreparedStatement
-        for (int i = 0; i < params.size(); i++) {
-            ps.setObject(i + 1, params.get(i));
+        if (id > 0) {
+            sql += " AND id = ?";
+            params.add(id);
         }
-        
-        try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                Partner partner = new Partner();
-                partner.setId(rs.getInt("id"));
-                partner.setUserid(rs.getInt("userid"));
-                partner.setPartnerName(rs.getString("partnerName"));
-                partner.setPartnerAddress(rs.getString("partnerAddress"));
-                partner.setPartnerPhone(rs.getString("partnerPhone"));
-                partner.setPartnerEmail(rs.getString("partnerEmail"));
-                partner.setAmountMoney(rs.getDouble("amountMoney"));
-                partners.add(partner);
+        if (name != null && !name.trim().isEmpty()) {
+            sql += " AND partnerName LIKE ?";
+            params.add("%" + name.trim() + "%");
+        }
+        if (address != null && !address.trim().isEmpty()) {
+            sql += " AND partnerAddress LIKE ?";
+            params.add("%" + address.trim() + "%");
+        }
+        if (phone != null && !phone.trim().isEmpty()) {
+            sql += " AND partnerPhone LIKE ?";
+            params.add("%" + phone.trim() + "%");
+        }
+        if (email != null && !email.trim().isEmpty()) {
+            sql += " AND LOWER(partnerEmail) LIKE LOWER(?)";
+            params.add("%" + email.trim() + "%");
+        }
+        if (debt > 0) {
+            sql += " AND amountMoney >= ?";
+            params.add(debt);
+        }
+
+        try ( Connection conn = new DBContext().getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
             }
-        }
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
-    return partners;
-}
-     
-      public List<Partner> searchPartners2(int id, String name, String address, String phone, String email, double debt) {
-    List<Partner> partners = new ArrayList<>();
-    // Bắt đầu với một câu truy vấn cơ bản không có điều kiện tìm kiếm cụ thể
-    String sql = "SELECT * FROM Partner WHERE is_delete=0 and amountMoney<0";
-    List<Object> params = new ArrayList<>();
 
-    if (id > 0) {
-        sql += " AND id = ?";
-        params.add(id);
-    }
-    if (name != null && !name.trim().isEmpty()) {
-        sql += " AND (partnerName LIKE ? OR partnerName LIKE ?)";
-        params.add(name.trim() + "%"); 
-        params.add("% " + name.trim() + "%"); // Matches the start of any subsequent word in the name
-    }
-
-    if (address != null && !address.trim().isEmpty()) {
-    sql += " AND (partnerAddress LIKE ? OR partnerAddress LIKE ?)";
-    params.add(address.trim() + "%"); // Matches the start of the address
-    params.add("% " + address.trim() + "%"); // Matches the start of any subsequent word in the address
-}
-    if (phone != null && !phone.trim().isEmpty()) {
-        sql += " AND partnerPhone LIKE ?";
-        params.add("%" + phone.trim() + "%");
-    }
-    if (email != null && !email.trim().isEmpty()) {
-        sql += " AND LOWER(partnerEmail) LIKE LOWER(?)";
-        params.add("%" + email.trim() + "%");
-    }
-    if (debt > 0) { // Chỉ thêm điều kiện này nếu debt > 0
-        sql += " AND amountMoney >= ?"; // Tìm các đối tác có khoản nợ lớn hơn hoặc bằng giá trị nhập vào
-        params.add(debt);
-    }
-
-    // Xóa bỏ logic thừa liên quan đến xử lý 'debt' ở đây
-
-    try (Connection conn = new DBContext().getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-         
-        // Đặt giá trị cho các tham số của PreparedStatement
-        for (int i = 0; i < params.size(); i++) {
-            ps.setObject(i + 1, params.get(i));
-        }
-        
-        try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                Partner partner = new Partner();
-                partner.setId(rs.getInt("id"));
-                partner.setUserid(rs.getInt("userid"));
-                partner.setPartnerName(rs.getString("partnerName"));
-                partner.setPartnerAddress(rs.getString("partnerAddress"));
-                partner.setPartnerPhone(rs.getString("partnerPhone"));
-                partner.setPartnerEmail(rs.getString("partnerEmail"));
-                partner.setAmountMoney(rs.getDouble("amountMoney"));
-                partners.add(partner);
+            try ( ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Partner partner = new Partner();
+                    partner.setId(rs.getInt("id"));
+                    partner.setUserid(rs.getInt("userid"));
+                    partner.setPartnerName(rs.getString("partnerName"));
+                    partner.setPartnerAddress(rs.getString("partnerAddress"));
+                    partner.setPartnerPhone(rs.getString("partnerPhone"));
+                    partner.setPartnerEmail(rs.getString("partnerEmail"));
+                    partner.setAmountMoney(rs.getDouble("amountMoney"));
+                    partners.add(partner);
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
+        return partners;
     }
-    return partners;
-}
-      
-      
-     // Method to soft-delete invoices by partner ID
+
+    public List<Partner> searchPartners2(int id, String name, String address, String phone, String email, double debt) {
+        List<Partner> partners = new ArrayList<>();
+        // Bắt đầu với một câu truy vấn cơ bản không có điều kiện tìm kiếm cụ thể
+        String sql = "SELECT * FROM Partner WHERE is_delete=0 and amountMoney<0";
+        List<Object> params = new ArrayList<>();
+
+        if (id > 0) {
+            sql += " AND id = ?";
+            params.add(id);
+        }
+        if (name != null && !name.trim().isEmpty()) {
+            sql += " AND (partnerName LIKE ? OR partnerName LIKE ?)";
+            params.add(name.trim() + "%");
+            params.add("% " + name.trim() + "%"); // Matches the start of any subsequent word in the name
+        }
+
+        if (address != null && !address.trim().isEmpty()) {
+            sql += " AND (partnerAddress LIKE ? OR partnerAddress LIKE ?)";
+            params.add(address.trim() + "%"); // Matches the start of the address
+            params.add("% " + address.trim() + "%"); // Matches the start of any subsequent word in the address
+        }
+        if (phone != null && !phone.trim().isEmpty()) {
+            sql += " AND partnerPhone LIKE ?";
+            params.add("%" + phone.trim() + "%");
+        }
+        if (email != null && !email.trim().isEmpty()) {
+            sql += " AND LOWER(partnerEmail) LIKE LOWER(?)";
+            params.add("%" + email.trim() + "%");
+        }
+        if (debt > 0) { // Chỉ thêm điều kiện này nếu debt > 0
+            sql += " AND amountMoney >= ?"; // Tìm các đối tác có khoản nợ lớn hơn hoặc bằng giá trị nhập vào
+            params.add(debt);
+        }
+
+        // Xóa bỏ logic thừa liên quan đến xử lý 'debt' ở đây
+        try ( Connection conn = new DBContext().getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            // Đặt giá trị cho các tham số của PreparedStatement
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            try ( ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Partner partner = new Partner();
+                    partner.setId(rs.getInt("id"));
+                    partner.setUserid(rs.getInt("userid"));
+                    partner.setPartnerName(rs.getString("partnerName"));
+                    partner.setPartnerAddress(rs.getString("partnerAddress"));
+                    partner.setPartnerPhone(rs.getString("partnerPhone"));
+                    partner.setPartnerEmail(rs.getString("partnerEmail"));
+                    partner.setAmountMoney(rs.getDouble("amountMoney"));
+                    partners.add(partner);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return partners;
+    }
+
+    // Method to soft-delete invoices by partner ID
     public void deletePartnerInvoices(int partnerId) {
         String sql = "UPDATE Invoice SET is_delete = 1 WHERE partnerid = ?";
-        try (Connection conn = new DBContext().getConnection();
-             PreparedStatement statement = conn.prepareStatement(sql)) {
+        try ( Connection conn = new DBContext().getConnection();  PreparedStatement statement = conn.prepareStatement(sql)) {
             statement.setInt(1, partnerId);
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -470,12 +455,11 @@ public class PartnerDAO {
             // Consider logging this error or throwing a custom exception
         }
     }
-    
+
     // Method to soft-delete a partner by ID
     public void deletePartner(int id) {
         String sql = "UPDATE Partner SET is_delete = 1 WHERE id = ?";
-        try (Connection conn = new DBContext().getConnection();
-             PreparedStatement statement = conn.prepareStatement(sql)) {
+        try ( Connection conn = new DBContext().getConnection();  PreparedStatement statement = conn.prepareStatement(sql)) {
             statement.setInt(1, id);
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -483,7 +467,7 @@ public class PartnerDAO {
             // Consider logging this error or throwing a custom exception
         }
     }
-    
+
     // Method to soft-delete both partner and their invoices
     public void deletePartnerAndInvoices(int partnerId) {
         // Soft-delete invoices first to maintain referential integrity
@@ -491,5 +475,5 @@ public class PartnerDAO {
         // Then soft-delete the partner
         deletePartner(partnerId);
     }
-    
+
 }
