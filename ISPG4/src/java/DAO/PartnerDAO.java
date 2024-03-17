@@ -281,27 +281,53 @@ public class PartnerDAO {
         }
         return partner;
     }
-     public void updatePartner(Partner partner) {
-        String sql = "UPDATE Partner SET userid = ?, partnerName = ?, partnerPhone = ?, partnerEmail = ?, partnerAddress = ?, amountMoney = ? WHERE id = ?";
-        try (Connection conn = new DBContext().getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            
-            ps.setInt(1, partner.getUserid());
-            ps.setString(2, partner.getPartnerName());
-            ps.setString(3, partner.getPartnerPhone());
-            ps.setString(4, partner.getPartnerEmail());
-            ps.setString(5, partner.getPartnerAddress());
-            ps.setDouble(6, partner.getAmountMoney());
-            ps.setInt(7, partner.getId());
+         public void updatePartner(Partner partner) {
+    String sql = "UPDATE Partner SET userid = ?, partnerName = ?, partnerPhone = ?, partnerEmail = ?, partnerAddress = ? WHERE id = ?";
+    try (Connection conn = new DBContext().getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        
+        ps.setInt(1, partner.getUserid());
+        ps.setString(2, partner.getPartnerName());
+        ps.setString(3, partner.getPartnerPhone());
+        ps.setString(4, partner.getPartnerEmail());
+        ps.setString(5, partner.getPartnerAddress());
+        // Uncomment the following line if you want to update the amountMoney field.
+        // ps.setDouble(6, partner.getAmountMoney());
+        ps.setInt(6, partner.getId()); // This should be the last parameter now after removing the extra comma.
 
-            int affectedRows = ps.executeUpdate();
-            if (affectedRows == 0) {
-                throw new SQLException("Updating partner failed, no rows affected.");
+        int affectedRows = ps.executeUpdate();
+        if (affectedRows == 0) {
+            throw new SQLException("Updating partner failed, no rows affected.");
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        // Handle exception
+    }
+
+    }
+     
+     public Partner getPartnerById(int partnerId) {
+        Partner partner = null;
+        try (Connection conn = new DBContext().getConnection();
+             PreparedStatement ps = conn.prepareStatement("SELECT * FROM Partner WHERE id = ?")) {
+            ps.setInt(1, partnerId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    partner = new Partner();
+                    partner.setId(rs.getInt("id"));
+                    partner.setUserid(rs.getInt("userid"));
+                    partner.setPartnerName(rs.getString("partnerName"));
+                    partner.setPartnerPhone(rs.getString("partnerPhone"));
+                    partner.setPartnerEmail(rs.getString("partnerEmail"));
+                    partner.setPartnerAddress(rs.getString("partnerAddress"));
+                    partner.setAmountMoney(rs.getDouble("amountMoney"));
+                    // ... populate other fields as needed
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            // Handle exception
         }
+        return partner;
     }
      
 
