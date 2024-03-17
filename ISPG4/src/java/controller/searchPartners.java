@@ -58,6 +58,6 @@ public class searchPartners extends HttpServlet {
             request.setAttribute("errorMessage", "Error processing search request.");
         }
 
-        request.getRequestDispatcher("searchResults.jsp").forward(request, response);
+        request.getRequestDispatcher("partner2.jsp").forward(request, response);
     }
 }
