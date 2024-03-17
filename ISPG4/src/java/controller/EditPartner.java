@@ -97,7 +97,13 @@ private PartnerDAO partnerDAO = new PartnerDAO();
     String partnerEmail = request.getParameter("partnerEmail");
     String partnerAddress = request.getParameter("partnerAddress");
     String amountMoneyStr = request.getParameter("amountMoney");
-
+    partnerPhone = partnerPhone.isEmpty() ? null : partnerPhone;
+    partnerEmail = partnerEmail.isEmpty() ? null : partnerEmail;
+     if (partnerName == null || partnerName.trim().isEmpty()) {
+        request.setAttribute("errorMessage", "Tên người nợ không được để trống.");
+        doGet(request, response); // Gọi lại doGet để xử lý hiển thị form với thông báo lỗi
+        return;
+        }
     // Validate that the mandatory parameters are present
     if (useridStr == null || partneridStr == null || useridStr.isEmpty() || partneridStr.isEmpty()) {
         // Parameters are missing, handle this case properly, e.g., show an error message
@@ -132,6 +138,8 @@ private PartnerDAO partnerDAO = new PartnerDAO();
 
     // Update partner information in the database
     PartnerDAO partnerDAO = new PartnerDAO(); // Log the stack trace for debugging purposes
+     partner.setPartnerPhone(partnerPhone);
+    partner.setPartnerEmail(partnerEmail);
     // This prints the stack trace to the server logs
     // Provide a more user-friendly message to the client
     partnerDAO.updatePartner(partner);
