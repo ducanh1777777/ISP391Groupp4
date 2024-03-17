@@ -53,7 +53,10 @@
       <input type="hidden" name="partnerid" value="${partner.id}" />
         <div class="input-container">
                 <label for="partnerName">Tên:</label>
-                <input type="text" name="partnerName" value="${partner.partnerName}" required/><br>
+                <input type="text" name="partnerName" value="${partner.partnerName}" /><br>
+                 <% if (request.getAttribute("errorMessage") != null) { %>
+        <div style="color: red;"><%= request.getAttribute("errorMessage").toString() %></div>
+    <% } %>
             </div>
             <div class="input-container">
                 <label for="partnerPhone">SDT:</label>
@@ -69,7 +72,7 @@
             </div>
             <div class="input-container">
                 <label for="amountMoney">Số tiền nợ:</label>
-                <input type="number" name="amountMoney" value="${partner.amountMoney}" readonly="readonly"/><br>
+                <input type="number" name="amountMoney" value="${partner.amountMoney}" /><br>
             </div>
         <input type="submit" value="Cập nhật" />
     </form>
