@@ -65,27 +65,36 @@ public class AdminControl extends HttpServlet {
             throws ServletException, IOException {
         DAO dao = new DAO();
         List<Users> list1 = dao.getAllUsers();
-        int page, numberpage=3;
-        int size= list1.size();
-        int num=(size%3==0?(size/3):((size/3))+1);
-        String xpage=request.getParameter("page");
-        if(xpage==null){
-            page=1;
-        }else{
+
+        String action = request.getParameter("action");
+
+        if ("deactivate".equals(action)) {
+            int userId = Integer.parseInt(request.getParameter("userId"));
+            dao.deactivateUser(userId); // Use DAO to deactivate the user
+            response.sendRedirect("AdminControl?message=User+Deactivated"); // Redirect to refresh the page and show a message
+            return; // Make sure to return after sending a redirect to stop further processing
+        }
+
+        int page, numberpage = 3;
+        int size = list1.size();
+        int num = (size % 3 == 0 ? (size / 3) : ((size / 3)) + 1);
+        String xpage = request.getParameter("page");
+        if (xpage == null) {
+            page = 1;
+        } else {
             page = Integer.parseInt(xpage);
         }
-        int start,end;
-        start=(page-1)*numberpage;
-        end=Math.min(page*numberpage, size);
+        int start, end;
+        start = (page - 1) * numberpage;
+        end = Math.min(page * numberpage, size);
         List<Users> list = dao.getListByPage(list1, start, end);
         request.setAttribute("data", list);
         request.setAttribute("page", page);
         request.setAttribute("num", num);
         request.getRequestDispatcher("AdminControl.jsp").forward(request, response);
-        System.out.println("page:"+page);
-        System.out.println("num"+num);
+        System.out.println("page:" + page);
+        System.out.println("num" + num);
     }
-    
 
     /**
      * Handles the HTTP <code>POST</code> method.
