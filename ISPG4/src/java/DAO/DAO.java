@@ -488,4 +488,27 @@ public class DAO {
             return null;
         }
     }
+    
+    public void deactivateUser(int userId) {
+        String sql = "UPDATE Users SET is_active = 0 WHERE id = ? AND isAdmin = 0"; // Only deactivate non-admin users
+        try {
+            conn = new DBContext().getConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, userId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (ps != null) {
+                    ps.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
 }
