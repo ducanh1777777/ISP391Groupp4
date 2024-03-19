@@ -5,6 +5,7 @@
 package DAO;
 
 import context.DBContext;
+import entity.Partner;
 import entity.Users;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,20 +14,69 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import ultil.MD5;
 import ultil.SendMail;
 
-
 /**
  *
- * @author Admin
+ * @author ducanh
  */
 public class DAO {
+
     Connection conn = null;
     PreparedStatement ps = null;
     ResultSet rs = null;
+
+    public String registerUser(String username, String pass, String birth, String email, String name) {
+        try {
+
+            String password = MD5.getMd5(pass);
+            String token = UUID.randomUUID().toString(); // Tạo mã token ngẫu nhiên
+            //chuan bi string sql
+            String sql = "insert into Users (username, password, fullname, dob, email, is_active, created_at, token )\n"
+                    + "values (?,?,?,?,?,0,NOW(),?)";
+            conn = new DBContext().getConnection();//mo ket noi voi sql
+            ps = conn.prepareStatement(sql);
+            //set bien dungs voiw thuw tu bien trong string tren
+            ps.setString(1, username);
+            ps.setString(2, password);
+            ps.setString(3, name);
+            ps.setString(4, birth);
+            ps.setString(5, email);
+            ps.setString(6, token);
+
+            //goi cau lenh execute
+            ps.executeUpdate();
+
+            SendMail.send(email, "Verify new user", "<h2>Welcome to my system</h2>"
+                    + "<a href=\"http://localhost:8080/ISPG4/verify-user?username="
+                    + username + "&token=" + token + " \" > Click here to verify your account!</a> ");
+            return username;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public boolean accAccount(String username, String token) {
+        try {
+            String sql = " update Users set is_active = 1 where username = ? and token = ?";
+            conn = new DBContext().getConnection();//mo ket noi voi sql
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, username);
+            ps.setString(2, token);
+            ps.executeUpdate();
+            return true;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public Users login(String user, String pass) {
         String sql = "SELECT * FROM Users WHERE username = ? AND password = ? AND is_active = 1";
         try {
@@ -53,50 +103,7 @@ public class DAO {
         return null;
 
     }
-    public String registerUser(String username, String pass, String birth, String email, String name) {
-        try {
 
-            String password = MD5.getMd5(pass);
-            //chuan bi string sql
-            String sql = "insert into Users (username, password, fullname, dob, email, is_active, created_at )\n"
-                    + "values (?,?,?,?,?,0,NOW())";
-            conn = new DBContext().getConnection();//mo ket noi voi sql
-            ps = conn.prepareStatement(sql);
-            //set bien dungs voiw thuw tu bien trong string tren
-            ps.setString(1, username);
-            ps.setString(2, password);
-            ps.setString(3, name);
-            ps.setString(4, birth);
-            ps.setString(5, email);
-
-            //goi cau lenh execute
-            ps.executeUpdate();
-
-            SendMail.send(email, "Verify new user", "<h2>Welcome to my system</h2>"
-                    + "<a href=\"http://localhost:9999/ISPG4/verify-user?username="
-                    + username + " \" > Click here to verify your account!</a> ");
-            return username;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public boolean accAccount(String username) {
-        try {
-            String sql = " update Users set is_active = 1 where username = ?";
-            conn = new DBContext().getConnection();//mo ket noi voi sql
-            ps = conn.prepareStatement(sql);
-            ps.setString(1, username);
-            ps.executeUpdate();
-            return true;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-    
     public boolean checkUserExists(String username) {
         String sql = "SELECT COUNT(*) FROM Users WHERE username = ?";
         try {
@@ -332,7 +339,7 @@ public class DAO {
         }
         return false;
     }
-    
+
     public boolean checkOldPassword(String username, String oldPassword) {
         try {
             String sql = "SELECT * FROM Users WHERE username = ? AND password = ?";
@@ -361,6 +368,124 @@ public class DAO {
         }
 
     }
+
+    public Users updateProfileUser(String username, String fullname, String dob, String email, String phone) {
+        Users updatedUser = null;
+        try {
+            String sql = "update Users set fullname = ?, dob = ?, email = ?, phone = ?,update_at = CURRENT_TIMESTAMP where username = ?";
+            conn = new DBContext().getConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, fullname);
+            ps.setString(2, dob);
+            ps.setString(3, email);
+            ps.setString(4, phone);
+            ps.setString(5, username);
+            int rowsAffected = ps.executeUpdate();
+
+            if (rowsAffected > 0) {
+                // If the update was successful, retrieve the updated user information
+                String selectSql = "select * from Users where username = ?";
+                ps = conn.prepareStatement(selectSql);
+                ps.setString(1, username);
+                ResultSet rs = ps.executeQuery();
+
+                if (rs.next()) {
+                    // Create a User object with the updated information
+                    updatedUser = new Users();
+                    updatedUser.setUsername(rs.getString("username"));
+                    updatedUser.setFullname(rs.getString("fullname"));
+                    updatedUser.setDob(rs.getString("dob"));
+                    updatedUser.setEmail(rs.getString("email"));
+                    updatedUser.setPhone(rs.getString("phone"));
+                }
+
+                rs.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            // Close resources (Connection, PreparedStatement, etc.)
+            // You should handle closing resources properly, preferably in a try-with-resources block
+        }
+
+        return updatedUser;
+    }
+
+    public void insertPartner(int userid, String partnerName, String partnerPhone,
+            String email, String partnerAddress, double amountMoney) {
+        try {
+            String sql = "insert into Partner (userid, partnerName, partnerAddress, partnerPhone, partnerEmail, amountMoney)\n"
+                    + " values (?,?,?,?,?,?);";
+            conn = new DBContext().getConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, userid);
+            ps.setString(2, partnerName);
+            ps.setString(3, partnerAddress);
+            ps.setString(4, partnerPhone);
+            ps.setString(5, email);
+            ps.setDouble(6, amountMoney);
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public ArrayList<Partner> getListPartner() {
+        String sql1 = "SELECT p.id, p.userid, p.partnerName, p.partnerAddress, p.partnerPhone, p.partnerEmail, p.amountMoney "
+               + "FROM Partner p "
+               + "LEFT JOIN Users u ON p.userid = u.id "
+               + "WHERE p.is_delete = 0 and amountMoney>=0" ;
+        try {
+            ArrayList<Partner> list = new ArrayList<>();
+            conn = new DBContext().getConnection();
+            ps = conn.prepareStatement(sql1);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Partner u = new Partner();
+                u.setId(rs.getInt("id"));
+                u.setUserid(rs.getInt("userid"));
+                u.setPartnerName(rs.getString("partnerName"));
+                u.setPartnerAddress(rs.getString("partnerAddress"));
+                u.setPartnerPhone(rs.getString("partnerPhone"));
+                u.setPartnerEmail(rs.getString("partnerEmail"));
+                u.setAmountMoney(rs.getDouble("amountMoney"));
+                list.add(u);
+            }
+            return list;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    public ArrayList<Partner> getListPartner1() {
+        String sql1 = "SELECT p.id, p.userid, p.partnerName, p.partnerAddress, p.partnerPhone, p.partnerEmail, p.amountMoney "
+               + "FROM Partner p "
+               + "LEFT JOIN Users u ON p.userid = u.id "
+               + "WHERE p.is_delete = 0 and amountMoney<0";
+        try {
+            ArrayList<Partner> list = new ArrayList<>();
+            conn = new DBContext().getConnection();
+            ps = conn.prepareStatement(sql1);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Partner u = new Partner();
+                u.setId(rs.getInt("id"));
+                u.setUserid(rs.getInt("userid"));
+                u.setPartnerName(rs.getString("partnerName"));
+                u.setPartnerAddress(rs.getString("partnerAddress"));
+                u.setPartnerPhone(rs.getString("partnerPhone"));
+                u.setPartnerEmail(rs.getString("partnerEmail"));
+                u.setAmountMoney(rs.getDouble("amountMoney"));
+                list.add(u);
+            }
+            return list;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public ArrayList<Users> getAllUsers() {
 
         try {
@@ -415,7 +540,44 @@ public class DAO {
         }
         return arr;
     }
-    public List<Users> searchbyName(String txtSearch){
+    
+   public boolean updateAvatarUrl(int userId, String avatarUrl) {
+    Connection con = null;
+    PreparedStatement ps = null;
+    try {
+        conn = new DBContext().getConnection();// Giả sử bạn đã có phương thức getConnection
+        String sql = "UPDATE Users SET avatar_url = ? WHERE id = ?";
+        ps = con.prepareStatement(sql);
+        ps.setString(1, avatarUrl);
+        ps.setInt(2, userId);
+
+        int affectedRows = ps.executeUpdate();
+        return affectedRows > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
+    } finally {
+        try {
+            if (ps != null) ps.close();
+            if (con != null) con.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+}
+   public void updateIsAdmin(int isAdmin, String username) {
+        try {
+            String sql = "UPDATE users SET isAdmin = ? WHERE username = ?";
+            conn = new DBContext().getConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, isAdmin);
+            ps.setString(2, username);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+   public List<Users> searchbyName(String txtSearch){
        
             List<Users> list = new ArrayList<>();
             String query="select * from users where username like ?";
@@ -439,4 +601,18 @@ public class DAO {
         }
        return list;
    }
+   public boolean accAccount(String username) {
+        try {
+            String sql = " update Users set is_active = 1 where username = ?";
+            conn = new DBContext().getConnection();//mo ket noi voi sql
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, username);
+            ps.executeUpdate();
+            return true;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
