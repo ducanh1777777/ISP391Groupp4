@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 import ultil.MD5;
 import ultil.SendMail;
@@ -488,4 +489,35 @@ public class DAO {
             return null;
         }
     }
+    
+    public boolean sendOTP(String email) {
+    if (!checkEmailExists(email)) {
+        return false;
+    }
+    Random random = new Random();
+    String otp = String.format("%06d", random.nextInt(999999));
+    long currentTimeInMillis = System.currentTimeMillis();
+    long otpExpiryTimeInMillis = currentTimeInMillis + (5 * 60 * 1000);
+    Timestamp otpExpiry = new Timestamp(otpExpiryTimeInMillis);
+
+    try {
+        String updateOtpSql = "UPDATE Users SET otp = ?, otp_expiry = ? WHERE email = ?";
+        conn = new DBContext().getConnection();
+        ps = conn.prepareStatement(updateOtpSql);
+        ps.setString(1, otp);
+        ps.setTimestamp(2, otpExpiry);
+        ps.setString(3, email);
+        ps.executeUpdate();
+    } catch (Exception e) {
+        e.printStackTrace();
+        return false;
+    }
+    try {
+        SendMail.send(email, "Your OTP for password reset", "Your OTP is: " + otp + ". It expires in 5 minutes.");
+    } catch (Exception e) {
+        e.printStackTrace();
+        return false;
+    }
+    return true;
+}
 }
