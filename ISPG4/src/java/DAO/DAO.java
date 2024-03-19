@@ -13,6 +13,8 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import ultil.MD5;
 import ultil.SendMail;
 
@@ -413,4 +415,28 @@ public class DAO {
         }
         return arr;
     }
+    public List<Users> searchbyName(String txtSearch){
+       
+            List<Users> list = new ArrayList<>();
+            String query="select * from users where username like ?";
+             try {
+            conn= new DBContext().getConnection();
+            ps=conn.prepareStatement(query);
+            ps.setString(1,"%"+ txtSearch+"%");
+            rs= ps.executeQuery();
+            while(rs.next()){
+                list.add(new Users(rs.getInt(1),
+                        rs.getString(2),
+                        rs.getString(3),
+                        rs.getString(4),
+                        rs.getString(5),
+                        rs.getString(6),
+                        rs.getString(7),
+                        rs.getInt(8)));
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(DAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+       return list;
+   }
 }
