@@ -111,6 +111,7 @@
                                 <th>Email</th>
                                 <th>Phone</th>
                                 <th>isAdmin</th>
+                                <th>Deactivate</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -129,6 +130,11 @@
                                             <option value="1" ${o.isAdmin == 1 ? 'selected' : ''}>Yes</option>
                                             <option value="0" ${o.isAdmin == 0 ? 'selected' : ''}>No</option>
                                         </select>
+                                    </td>
+                                    <td>
+                                        <c:if test="${o.isAdmin == 0 && o.username != sessionScope.currentUser.username}">
+                                            <a href="AdminControl?action=deactivate&userId=${o.id}">Deactivate</a>
+                                        </c:if>
                                     </td>
                                 </tr>
                             </c:forEach> 
