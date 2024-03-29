@@ -91,6 +91,18 @@
 
                     </div>
                 </div>
+                <form action="searchUsers" method="get" class="form-inline my-2-lg-0">
+                    <div class="input-goup input-group-sm">
+                        <input value="${txtS}" name="txt" type="text" class="form-control" aria-label="Small">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-secondary btn-number">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+
+
+                </form>
                 <c:set var="page" value="${requestScope.page}"/>
                 <div class="center">
                     <div class="pagination"> 
@@ -99,49 +111,46 @@
                         </c:forEach>
                     </div>
                 </div>
-                <form action="changeAdmin" method="POST">
-                    <table class="table table-striped table-hover">
-                        <thead>
+
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User Name</th>
+                            <th>Password</th>
+                            <th>Full Name</th>
+                            <th>DOB</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>isAdmin</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <c:forEach items="${data}" var="o">
                             <tr>
-                                <th>ID</th>
-                                <th>User Name</th>
-                                <th>Password</th>
-                                <th>Full Name</th>
-                                <th>DOB</th>
-                                <th>Email</th>
-                                <th>Phone</th>
-                                <th>isAdmin</th>
-                                <th>Deactivate</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <c:forEach items="${data}" var="o">
-                                <tr>
-                                    <td>${o.id}</td>   
-                                    <td>${o.username}</td>
-                                    <td>${o.password}</td>
-                                    <td>${o.fullname}</td>  
-                                    <td>${o.dob}</td> 
-                                    <td>${o.email}</td> 
-                                    <td>${o.phone}</td>      
-                                    <td>
-                                        <input type="hidden" name="usernames[]" value="${o.username}" />
-                                        <select name="isAdmins[]">
+                                <td>${o.id}</td>   
+                                <td>${o.username}</td>
+                                <td>${o.password}</td>
+                                <td>${o.fullname}</td>  
+                                <td>${o.dob}</td> 
+                                <td>${o.email}</td> 
+                                <td>${o.phone}</td> 
+
+                                <td>
+                                    <form action="changeAdmin" method="POST">
+                                        <input type="hidden" name="username" value="${o.username}" />
+                                        <select name="isAdmin">
                                             <option value="1" ${o.isAdmin == 1 ? 'selected' : ''}>Yes</option>
                                             <option value="0" ${o.isAdmin == 0 ? 'selected' : ''}>No</option>
                                         </select>
-                                    </td>
-                                    <td>
-                                        <c:if test="${o.isAdmin == 0 && o.username != sessionScope.currentUser.username}">
-                                            <a href="AdminControl?action=deactivate&userId=${o.id}">Deactivate</a>
-                                        </c:if>
-                                    </td>
-                                </tr>
-                            </c:forEach> 
-                        </tbody>
-                    </table>
-                    <input type="submit" value="save" />
-                </form>
+                                        <input type="submit" value="save" />
+                                    </form>
+                                </td>
+
+                            </tr>
+                        </c:forEach> 
+                    </tbody>
+                </table>
                 <a href="home2.jsp" >Quay lại DEBTS</a>
             </div>
         </div>
